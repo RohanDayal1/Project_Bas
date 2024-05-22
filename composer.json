@@ -1,0 +1,18 @@
+{
+    "name": "rohan/project_bas",
+    "require-dev": {
+        "phpunit/phpunit": "^11.1"
+    },
+    "autoload": {
+        "psr-4": {
+            "Bas\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "RohanDayal1",
+            "email": "9019234@student.zadkine.nl"
+        }
+    ],
+    "require": {}
+}
