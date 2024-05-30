@@ -31,33 +31,34 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['insert'])) {
 ?>
 
 <!DOCTYPE html>
-<html lang="nl">=
+<html lang="nl">
 <head>
     <meta charset="UTF-8">
     <title>CRUD Klant</title>
 	<link rel="stylesheet" href="../style.css">
 </head>
 <body class ="formbody">
-    <h1>Klant Toevoegen</h1>
     <form class = "crudform" method="post">
+    <h1>Klant Toevoegen</h1>
         <label for="nv">Klantnaam:</label>
-        <input type="text" id="nv" name="klantnaam" placeholder="Klantnaam" required/>
+        <input type="text" id="insert" name="klantnaam" placeholder="Klantnaam" required/>
         <br>   
         <label for="an">Klantemail:</label>
-        <input type="email" id="an" name="klantemail" placeholder="Klantemail" required/>
+        <input type="email" id="insert" name="klantemail" placeholder="Klantemail" required/>
         <br>   
         <label for="adres">Klantadres:</label>
-        <input type="text" id="adres" name="klantadres" placeholder="Klantadres" required/>
+        <input type="text" id="insert" name="klantadres" placeholder="Klantadres" required/>
         <br>
         <label for="postcode">Klantpostcode:</label>
-        <input type="text" id="postcode" name="klantpostcode" placeholder="Klantpostcode" required/>
+        <input type="text" id="insert" name="klantpostcode" placeholder="Klantpostcode" required/>
         <br>
         <label for="woonplaats">Klantwoonplaats:</label>
-        <input type="text" id="woonplaats" name="klantwoonplaats" placeholder="Klantwoonplaats" required/>
+        <input type="text" id="insert" name="klantwoonplaats" placeholder="Klantwoonplaats" required/>
         <br><br>
-        <input type='submit' name='insert' value='Toevoegen'>
+        <input type='submit' name='submit' value='Toevoegen'>
 		<a href='read.php' class='back-link'>Terug</a>
     </form>
+    
 </body>
 </html>
 

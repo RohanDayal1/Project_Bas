@@ -43,6 +43,7 @@
 <a href="read.php">Terug</a>
 
 </body>
+
 </html>
 
 <?php

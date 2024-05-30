@@ -1,0 +1,1 @@
+{"version":1,"defects":{"KlantInsertTest::testInsertKlantTrue":8},"times":{"KlantInsertTest::testInsertKlantTrue":0.011,"KlantTest::testgetKlanten":0.001,"KlantTest::testGetKlant":0.005}}
