@@ -129,7 +129,8 @@ form.crudform label {
 form.crudform input[type="text"],
 form.crudform input[type="email"],
 form.crudform input[type="password"],
-form.crudform input[type="submit"] {
+form.crudform input[type="submit"],
+form.crudform input[type="date"] {
     width: calc(100% - 20px);
     padding: 10px;
     margin-bottom: 10px;

@@ -1,65 +1,98 @@
 <?php
-// auteur: RohanD
-// functie: insert class Klant
-
-// Autoloader classes via composer
 require '../../vendor/autoload.php';
 use Bas\classes\Klant;
-use Bas\classes\Database;
+use Bas\classes\Artikel;
+use Bas\classes\Verkooporder;
 
-$db = new Database();
-$db->getConnection();
+$message = "";
 
-// Maak een nieuwe klant aan
+// Maak nieuwe objecten aan
 $klant = new Klant();
+$artikel = new Artikel();
+$verkooporder = new Verkooporder();
 
-if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['insert'])) {
-    $data = [
-        'klantNaam' => $_POST['klantnaam'],
-        'klantEmail' => $_POST['klantemail'],
-        'klantAdres' => $_POST['klantadres'],
-        'klantPostcode' => $_POST['klantpostcode'],
-        'klantWoonplaats' => $_POST['klantwoonplaats']
+$klanten = $klant->getKlanten(); // Hier wordt de getKlanten methode opgeroepen
+
+$artikelen = $artikel->getArtikelen();
+
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["insert"]) && $_POST["insert"] == "Toevoegen") {
+    $requiredFields = [
+        'klantId', 'artId', 'verkOrdDatum', 'verkOrdBestAantal', 'verkOrdStatus'
     ];
-    
-    if ($klant->insertKlant($data)) {
-        echo "Klant succesvol toegevoegd!";
+    $isFormValid = true;
+
+    foreach ($requiredFields as $field) {
+        if (empty($_POST[$field])) {
+            $isFormValid = false;
+            break;
+        }
+    }
+
+    if ($isFormValid) {
+        // Bereid de verkoopordergegevens voor
+        $verkoopordergegevens = [
+            'klantId' => intval($_POST['klantId']),
+            'artId' => intval($_POST['artId']),
+            'verkOrdDatum' => $_POST['verkOrdDatum'],
+            'verkOrdBestAantal' => intval($_POST['verkOrdBestAantal']),
+            'verkOrdStatus' => intval($_POST['verkOrdStatus'])
+        ];
+
+        if ($verkooporder->insertVerkooporder($verkoopordergegevens)) {
+            $message = "Verkooporder succesvol toegevoegd!";
+        } else {
+            $message = "Er is een fout opgetreden bij het toevoegen van de verkooporder.";
+        }
     } else {
-        echo "Er is een fout opgetreden bij het toevoegen van de klant.";
+        $message = "Vul alstublieft alle vereiste velden in.";
     }
 }
 ?>
 
 <!DOCTYPE html>
-<html lang="nl">
+<html>
 <head>
     <meta charset="UTF-8">
-    <title>CRUD Klant</title>
-	<link rel="stylesheet" href="../style.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Toevoegen Verkooporder</title>
+    <link rel="stylesheet" href="../style.css">
 </head>
-<body class ="formbody">
-    <form class = "crudform" method="post">
-    <h1>Klant Toevoegen</h1>
-        <label for="nv">Klantnaam:</label>
-        <input type="text" id="insert" name="klantnaam" placeholder="Klantnaam" required/>
-        <br>   
-        <label for="an">Klantemail:</label>
-        <input type="email" id="insert" name="klantemail" placeholder="Klantemail" required/>
-        <br>   
-        <label for="adres">Klantadres:</label>
-        <input type="text" id="insert" name="klantadres" placeholder="Klantadres" required/>
+<body class="formbody">
+<h1>Verkooporder Toevoegen</h1>
+    <?php if ($message): ?>
+        <p><?php echo $message; ?></p>
+    <?php endif; ?>
+    <form class="crudform" method="post">
+        <label for="klantId">Klant:</label>
+        <select id="klantId" name="klantId" required>
+            <option value="">Selecteer Klant</option>
+            <?php foreach ($klanten as $klant): ?>
+                <option value="<?php echo $klant['klantId']; ?>"><?php echo $klant['klantNaam']; ?></option>
+            <?php endforeach; ?>
+        </select>
         <br>
-        <label for="postcode">Klantpostcode:</label>
-        <input type="text" id="insert" name="klantpostcode" placeholder="Klantpostcode" required/>
+        <label for="artId">Artikel:</label>
+        <select id="artId" name="artId" required>
+            <option value="">Selecteer Artikel</option>
+            <?php foreach ($artikelen as $artikel): ?>
+                <option value="<?php echo $artikel['artId']; ?>"><?php echo $artikel['artOmschrijving']; ?></option>
+            <?php endforeach; ?>
+        </select>
         <br>
-        <label for="woonplaats">Klantwoonplaats:</label>
-        <input type="text" id="insert" name="klantwoonplaats" placeholder="Klantwoonplaats" required/>
+        <h3>Verkoopordergegevens</h3>
+        <label for="verkOrdDatum">Verkooporder Datum:</label>
+        <input type="date" id="verkOrdDatum" name="verkOrdDatum" required/>
+        <br>
+        <label for="verkOrdBestAantal">Verkooporder Bestel Aantal:</label>
+        <input type="number" id="verkOrdBestAantal" name="verkOrdBestAantal" required/>
+        <br>
+        <label for="verkOrdStatus">Verkooporder Status:</label>
+        <input type="number" id="verkOrdStatus" name="verkOrdStatus" required/>
         <br><br>
-        <input type='submit' name='submit' value='Toevoegen'>
-		<a href='read.php' class='back-link'>Terug</a>
-    </form>
+        <input type='submit' name='insert' value='Toevoegen'>
+    </form></br>
+
+    <a href='read.php'>Terug</a>
+
 </body>
 </html>
-
-
-

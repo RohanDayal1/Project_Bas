@@ -21,10 +21,10 @@ class VerkoopOrder extends Database {
     // Methods
     
     /**
-     * Summary of crudVerkoopOrder
+     * Summary of crudVerkooporder
      * @return void
      */
-    public function crudVerkoopOrder() : void {
+    public function crudVerkooporder() : void {
         // Haal alle verkooporders op uit de database mbv de method getVerkoopOrders()
         $lijst = $this->getVerkoopOrders();
 
@@ -155,13 +155,18 @@ class VerkoopOrder extends Database {
             
             return true;
         } catch (PDOException $e) {
+           
             echo "Error: " . $e->getMessage();
             return false;
         }
     }
 
-    public function updateVerkoopOrder($row) : bool {
-        // Voer de update van de verkooporder uit
+    /**
+     * Summary of updateVerkoopOrder
+     * @param array $row
+     * @return bool
+     */
+    public function updateVerkoopOrder(array $row) : bool {
         try {
             $sql = "UPDATE $this->table_name SET klantId = :klantId, artId = :artId, verkOrdDatum = :verkOrdDatum, verkOrdBestAantal = :verkOrdBestAantal, verkOrdStatus = :verkOrdStatus WHERE verkOrdId = :verkOrdId";
             $stmt = self::$conn->prepare($sql);
@@ -193,9 +198,32 @@ class VerkoopOrder extends Database {
     /**
      * Summary of insertVerkoopOrder
      * Voeg een nieuwe verkooporder toe aan de database
-     * @param mixed $row Array met verkoopordergegevens
+     * @param array $verkoopordergegevens
      * @return bool True als het invoegen succesvol is, anders False
      */
-    
+    public function insertVerkoopOrder(array $verkoopordergegevens): bool {
+        try {
+            self::$conn->beginTransaction();
+
+            $sql = "INSERT INTO $this->table_name (klantId, artId, verkOrdDatum, verkOrdBestAantal, verkOrdStatus) 
+                    VALUES (:klantId, :artId, :verkOrdDatum, :verkOrdBestAantal, :verkOrdStatus)";
+            
+            $stmt = self::$conn->prepare($sql);
+            $stmt->bindParam(':klantId', $verkoopordergegevens['klantId'], PDO::PARAM_INT);
+            $stmt->bindParam(':artId', $verkoopordergegevens['artId'], PDO::PARAM_INT);
+            $stmt->bindParam(':verkOrdDatum', $verkoopordergegevens['verkOrdDatum'], PDO::PARAM_STR);
+            $stmt->bindParam(':verkOrdBestAantal', $verkoopordergegevens['verkOrdBestAantal'], PDO::PARAM_INT);
+            $stmt->bindParam(':verkOrdStatus', $verkoopordergegevens['verkOrdStatus'], PDO::PARAM_INT);
+            $stmt->execute();
+
+            self::$conn->commit();
+
+            return true; // Succesvol ingevoegd
+        } catch(PDOException $e) {
+            self::$conn->rollBack();
+            echo "Error: " . $e->getMessage();
+            return false; // Fout bij het invoegen
+        }
+    }
 }
 ?>

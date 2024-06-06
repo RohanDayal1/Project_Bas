@@ -24,6 +24,7 @@
             </ul>
         </nav>
     </header>
+    <a href='insert.php'>Toevoegen nieuw verkooporder</a><br><br>
 	
 <?php
 
