@@ -1,52 +1,72 @@
 <?php
-    // auteur: RohanD
-    // functie: update class Klant
+// auteur: RohanD
+// functie: update verkooporder
 
-    // Autoloader classes via composer
-    require '../../vendor/autoload.php';
-    use Bas\classes\Klant;
-    
-    $klant = new Klant;
+// Autoloader classes via Composer
+require '../../vendor/autoload.php';
+use Bas\classes\VerkoopOrder;
 
-    if(isset($_POST["update"]) && $_POST["update"] == "Wijzigen"){
+$verkooporder = new VerkoopOrder;
 
-        // Code voor een update
-        
+// Verwerken van formulierinzending
+if (isset($_POST["update"]) && $_POST["update"] == "Wijzigen") {
+    // Data voorbereiden voor update
+    $row = [
+        'verkOrdId' => $_POST['verkOrdId'],
+        'klantId' => $_POST['klantId'],
+        'artId' => $_POST['artId'],
+        'verkOrdDatum' => $_POST['verkOrdDatum'],
+        'verkOrdBestAantal' => $_POST['verkOrdBestAantal'],
+        'verkOrdStatus' => $_POST['verkOrdStatus']
+    ];
+
+    // Verkooporder bijwerken
+    $success = $verkooporder->updateVerkoopOrder($row);
+
+    // Bericht weergeven afhankelijk van succes van de update
+    if ($success) {
+        echo "Verkooporder succesvol bijgewerkt.<br>";
+    } else {
+        echo "Fout bij het bijwerken van de verkooporder.<br>";
     }
+}
 
-    if (isset($_GET['klantId'])){
-        $row = $klant->getKlant($_GET['klantId']);
-
-
+// Als verkOrdId is opgegeven, haal verkoopordergegevens op en toon formulier
+if (isset($_GET['verkOrdId'])) {
+    $row = $verkooporder->getVerkoopOrder($_GET['verkOrdId']);
+}
 ?>
+
 <!DOCTYPE html>
-<html>
+<html lang="nl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Crud</title>
+    <title>Verkooporder Wijzigen</title>
     <link rel="stylesheet" href="../style.css">
 </head>
 <body>
-<h1>CRUD Klant</h1>
-<h2>Wijzigen</h2>	
-<form method="post">
-<input type="hidden" name="klantId" 
-    value="<?php if(isset($row)) { echo $row['klantId']; } ?>">
-<input type="text" name="klantnaam" required 
-    value="<?php if(isset($row)) {echo $row['klantNaam']; }?>"> *</br>
-<input type="text" name="klantemail" required 
-    value="<?php if(isset($row)) {echo $row["klantEmail"]; }?>"> *</br></br>
-<input type="submit" name="update" value="Wijzigen">
-</form></br>
+    <h1>Verkooporder Wijzigen</h1>
+    <form method="post">
+        <input type="hidden" name="verkOrdId" value="<?= isset($row['verkOrdId']) ? htmlspecialchars($row['verkOrdId']) : '' ?>">
+        <label for="klantId">Klant:</label>
+        <input type="text" name="klantId"  value="<?= isset($row['klantId']) ? htmlspecialchars($row['klantId']) : '' ?>"> *</br>
+        <label for="artId">Artikel:</label>
+        <input type="text" name="artId"  value="<?= isset($row['artId']) ? htmlspecialchars($row['artId']) : '' ?>"> *</br>
+        <label for="verkOrdDatum">Datum:</label>
+        <input type="date" name="verkOrdDatum"  value="<?= isset($row['verkOrdDatum']) ? htmlspecialchars($row['verkOrdDatum']) : '' ?>"> *</br>
+        <label for="verkOrdBestAantal">Bestel Aantal:</label>
+        <input type="number" name="verkOrdBestAantal"  value="<?= isset($row['verkOrdBestAantal']) ? htmlspecialchars($row['verkOrdBestAantal']) : '' ?>"> *</br>
+        <label for="verkOrdStatus">Status:</label>
+        <select name="verkOrdStatus" >
+            <option value="Verzonden" <?= isset($row['verkOrdStatus']) && $row['verkOrdStatus'] == 'Verzonden' ? 'selected' : '' ?>>Verzonden</option>
+            <option value="Niet Verzonden" <?= isset($row['verkOrdStatus']) && $row['verkOrdStatus'] == 'Niet Verzonden' ? 'selected' : '' ?>>Niet Verzonden</option>
+            <option value="Onderweg" <?= isset($row['verkOrdStatus']) && $row['verkOrdStatus'] == 'Onderweg' ? 'selected' : '' ?>>Onderweg</option>
+        </select> *</br></br>
+        <input type="submit" name="update" value="Wijzigen">
+    </form></br>
 
-<a href="read.php">Terug</a>
-
+    <a href="read.php">Terug</a>
 </body>
 </html>
 
-<?php
-    } else {
-        echo "Geen klantId opgegeven<br>";
-    }
-?>

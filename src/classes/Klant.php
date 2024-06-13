@@ -4,6 +4,7 @@
 namespace Bas\classes;
 
 use Bas\classes\Database;
+use PDO;
 
 include_once "functions.php";
 
@@ -22,12 +23,17 @@ class Klant extends Database {
      * Summary of crudKlant
      * @return void
      */
-    public function crudKlant() : void {
-        // Haal alle klanten op uit de database mbv de method getKlanten()
-        $lijst = $this->getKlanten();
-
-        // Print een HTML tabel van de lijst    
-        $this->showTable($lijst);
+    public function crudKlant(): void {
+        try {
+            if (isset($_POST['search']) && !empty($_POST['klantNaam'])) {
+                $klanten = $this->searchKlanten($_POST['klantNaam']);
+            } else {
+                $klanten = $this->getKlanten();
+            }
+            $this->showTable($klanten);
+        } catch (PDOException $e) {
+            echo "Error: " . $e->getMessage();
+        }
     }
 
     /**
@@ -35,7 +41,7 @@ class Klant extends Database {
      * @return array
      */
     public function getKlanten() : array {
-        $sql = "SELECT klantId, klantEmail, klantNaam, klantAdres, klantPostcode, klantWoonplaats FROM " . $this->table_name;
+        $sql = "SELECT klantId, klantNaam, klantEmail, klantAdres, klantPostcode, klantWoonplaats FROM " . $this->table_name;
         $stmt = self::$conn->query($sql);
         $lijst = $stmt->fetchAll(\PDO::FETCH_ASSOC);
         return $lijst;
@@ -47,7 +53,7 @@ class Klant extends Database {
      * @return array
      */
     public function getKlant(int $klantId) : array {
-        $sql = "SELECT klantId, klantEmail, klantNaam, klantAdres, klantPostcode, klantWoonplaats FROM " . $this->table_name . " WHERE klantId = :klantId";
+        $sql = "SELECT klantId, klantNaam, klantEmail klantAdres, klantPostcode, klantWoonplaats FROM " . $this->table_name . " WHERE klantId = :klantId";
         $stmt = self::$conn->prepare($sql);
         $stmt->bindParam(':klantId', $klantId, \PDO::PARAM_INT);
         $stmt->execute();
@@ -76,39 +82,58 @@ class Klant extends Database {
      * @param array $lijst
      * @return void
      */
-    public function showTable(array $lijst) : void {
-        $txt = "<table>";
-
-        // Voeg de kolomnamen boven de tabel
-        $txt .= getTableHeader($lijst[0]);
-
-        foreach ($lijst as $row) {
-            $txt .= "<tr>";
-            $txt .=  "<td>" . $row["klantId"] . "</td>";
-            $txt .=  "<td>" . $row["klantNaam"] . "</td>";
-            $txt .=  "<td>" . $row["klantEmail"] . "</td>";
-            $txt .=  "<td>" . $row["klantAdres"] . "</td>";
-            $txt .=  "<td>" . $row["klantPostcode"] . "</td>";
-            $txt .=  "<td>" . $row["klantWoonplaats"] . "</td>";
-            
-            // Update
-            // Wijzig knopje
-            $txt .=  "<td>
-            <form method='post' action='update.php?klantId={$row["klantId"]}' >       
-                <button name='update'>Wzg</button>    
-            </form> </td>";
-
-            // Delete
-            $txt .=  "<td>
-            <form method='post' action='delete.php?klantId={$row["klantId"]}' >       
-                <button name='verwijderen'>Verwijderen</button>     
-            </form> </td>";    
-            $txt .= "</tr>";
+    private function showTable(array $klanten): void {
+        echo "<table>";
+        if (!empty($klanten)) {
+            echo $this->getTableHeader($klanten[0]);
+            foreach ($klanten as $row) {
+                echo "<tr>";
+                echo "<td>{$row['klantNaam']}</td>";
+                echo "<td>{$row['klantEmail']}</td>";
+                echo "<td>{$row['klantWoonplaats']}</td>";
+                echo "<td>{$row['klantAdres']}</td>";
+                echo "<td>{$row['klantPostcode']}</td>";
+                echo "<td><form method='post' action='update.php?klantId={$row['klantId']}'><button name='update'>Wzg</button></form></td>";
+                echo "<td><form method='POST' action='delete.php?klantId={$row['klantId']}'><button name='verwijderen'>Verwijderen</button></form></td>";
+                echo "</tr>";
+            }
+        } else {
+            echo "<tr><td colspan='6'>Geen klanten gevonden</td></tr>"; // Aangepast van 7 naar 6
         }
-        $txt .= "</table>";
-        echo $txt;
+        echo "</table>";
     }
 
+    private function getTableHeader(array $row): string {
+        $header = "<tr>";
+        foreach (array_keys($row) as $key) {
+            if ($key !== "klantId") { // klantId-kolom weghalen
+                $header .= "<th>" . htmlspecialchars($key) . "</th>";
+            }
+        }
+        $header .= "<th>Acties</th>";
+        $header .= "</tr>";
+        return $header;
+    }
+
+    /**
+     * Summary of searchCustomer
+     * Search for customers by name (klantNaam)
+     *
+     * @param string $searchTerm The search term to look for in customer names
+     * @return array Returns an array of customers matching the search term
+     */
+
+   public function searchKlanten(string $klantNaam): array {
+    try {$sql = "SELECT * FROM $this->table_name WHERE klantNaam LIKE :klantNaam";
+        $stmt = self::$conn->prepare($sql);
+        $naam = '%' . $klantNaam . '%';
+        $stmt->bindParam(':klantNaam', $naam, PDO::PARAM_STR);$stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];} catch (PDOException $e) {
+        echo "Error: " . $e->getMessage();
+        return [];
+    }
+}
+    
     // Delete klant
     /**
      * Summary of deleteKlant
@@ -116,12 +141,19 @@ class Klant extends Database {
      * @return bool
      */
     public function deleteKlant(int $klantId) : bool {
-        $sql = "DELETE FROM " . $this->table_name . " WHERE klantId = :klantId";
-        $stmt = self::$conn->prepare($sql);
-        $stmt->bindParam(':klantId', $klantId, \PDO::PARAM_INT);
-        return $stmt->execute();
+        try {
+            $sql = "DELETE FROM " . $this->table_name . " WHERE klantId = :klantId";
+            $stmt = self::$conn->prepare($sql);
+            $stmt->bindParam(':klantId', $klantId, \PDO::PARAM_INT);
+            return $stmt->execute();
+        } catch (\PDOException $e) {
+            // Log the error message
+            error_log('Delete Klant Error: ' . $e->getMessage());
+            return false;
+        }
     }
-
+    
+    
     public function updateKlant($row) : bool {
         $sql = "UPDATE " . $this->table_name . " SET klantEmail = :klantEmail, klantNaam = :klantNaam, klantAdres = :klantAdres, klantPostcode = :klantPostcode, klantWoonplaats = :klantWoonplaats WHERE klantId = :klantId";
         $stmt = self::$conn->prepare($sql);

@@ -1,23 +1,27 @@
-<?php 
+<?php
 // auteur: RohanD
-// functie: 
+// functie: Verwijderen van verkooporder
 
-// Autoloader classes via composer
 require '../../vendor/autoload.php';
-use Bas\classes\Klant;
+use Bas\classes\VerkoopOrder;
 
-if(isset($_POST["verwijderen"])){
-	
-	// Maak een object Klant
-	
-	
-	// Delete Klant op basis van NR
-	
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['verkOrdId'])) {
+    $verkOrdId = intval($_POST['verkOrdId']);
+    
+    // Instantiate VerkoopOrder class
+    $verkoopOrder = new VerkoopOrder();
 
-	echo '<script>alert("Klant verwijderd")</script>';
-	echo "<script> location.replace('read.php'); </script>";
+    // Call the delete method
+    $result = $verkoopOrder->deleteVerkoopOrder($verkOrdId);
+
+    if ($result) {
+        echo '<script>alert("Verkooporder verwijderd")</script>';
+        echo "<script> location.replace('read.php'); </script>";
+        exit;
+    } else {
+        echo "Error deleting verkooporder.";
+    }
+} else {
+    echo "Invalid request.";
 }
 ?>
-
-
-

@@ -78,38 +78,54 @@ class Artikel extends Database {
      * @return void
      */
     public function showTable(array $lijst) : void {
-        $txt = "<table>";
-
-        // Voeg de kolomnamen boven de tabel
-        $txt .= getTableHeader($lijst[0]);
-
-        foreach ($lijst as $row) {
-            $txt .= "<tr>";
-            $txt .=  "<td>" . $row["artId"] . "</td>";
-            $txt .=  "<td>" . $row["artOmschrijving"] . "</td>";
-            $txt .=  "<td>" . $row["artInkoop"] . "</td>";
-            $txt .=  "<td>" . $row["artVerkoop"] . "</td>";
-            $txt .=  "<td>" . $row["artMinVoorraad"] . "</td>";
-            $txt .=  "<td>" . $row["artMaxVoorraad"] . "</td>";
-            $txt .=  "<td>" . $row["artLocatie"] . "</td>";
-            
-            // Update
-            // Wijzig knopje
-            $txt .=  "<td>
-            <form method='post' action='update.php?artId={$row["artId"]}' >       
-                <button name='update'>Wzg</button>    
-            </form> </td>";
-
-            // Delete
-            $txt .=  "<td>
-            <form method='post' action='delete.php?artId={$row["artId"]}' >       
-                <button name='verwijderen'>Verwijderen</button>     
-            </form> </td>";    
-            $txt .= "</tr>";
+        if (!empty($lijst)) {
+            $txt = "<table>";
+    
+            // Voeg de kolomnamen boven de tabel
+            $txt .= $this->getTableHeader($lijst[0]);
+    
+            foreach ($lijst as $row) {
+                $txt .= "<tr>";
+                $txt .=  "<td>" . $row["artOmschrijving"] . "</td>";
+                $txt .=  "<td>" . $row["artInkoop"] . "</td>";
+                $txt .=  "<td>" . $row["artVerkoop"] . "</td>";
+                $txt .=  "<td>" . $row["artMinVoorraad"] . "</td>";
+                $txt .=  "<td>" . $row["artMaxVoorraad"] . "</td>";
+                $txt .=  "<td>" . $row["artLocatie"] . "</td>";
+    
+                // Update
+                // Wijzig knopje
+                $txt .=  "<td>
+                <form method='post' action='update.php?artId={$row["artId"]}' >       
+                    <button name='update'>Wzg</button>    
+                </form> </td>";
+    
+                // Delete
+                $txt .=  "<td>
+                <form method='post' action='delete.php?artId={$row["artId"]}' >       
+                    <button name='verwijderen'>Verwijderen</button>     
+                </form> </td>";    
+                $txt .= "</tr>";
+            }
+            $txt .= "</table>";
+        } else {
+            $txt = "<table><tr><td colspan='8'>Geen artikelen gevonden</td></tr></table>"; // Adjusted to 8 columns to match header count
         }
-        $txt .= "</table>";
         echo $txt;
     }
+    
+    private function getTableHeader(array $row): string {
+        $header = "<tr>";
+        foreach (array_keys($row) as $key) {
+            if ($key !== "artId") { // artId-kolom weghalen
+                $header .= "<th>" . htmlspecialchars($key) . "</th>";
+            }
+        }
+        $header .= "<th>Acties</th>";
+        $header .= "</tr>";
+        return $header;
+    }
+    
 
     // Delete artikel
     /**
