@@ -18,7 +18,6 @@ class VerkoopOrder extends Database {
     public $verkOrdStatus;
     private $table_name = "VerkoopOrder";   
 
-    // Methods
     
     /**
      * Summary of crudVerkooporder
@@ -99,21 +98,19 @@ class VerkoopOrder extends Database {
      * @param array $lijst
      * @return void
      */
-    public function showTable(array $lijst): void {
+    public function showTable(array $lijst) : void {
         $txt = "<table>";
-    
-        // Table headers
+
+        // Voeg de kolomnamen boven de tabel
         $txt .= "<tr>";
         $txt .= "<th>klantNaam</th>";
         $txt .= "<th>artNaam</th>";
         $txt .= "<th>verkOrdDatum</th>";
         $txt .= "<th>verkOrdBestAantal</th>";
         $txt .= "<th>verkOrdStatus</th>";
-        $txt .= "<th>Wijzig</th>"; // Update button column
-        $txt .= "<th>Verwijderen</th>"; // Delete button column
         $txt .= "</tr>";
-    
-        foreach ($lijst as $row) {
+
+        foreach($lijst as $row){
             $txt .= "<tr>";
             $txt .= "<td>" . htmlspecialchars($row["klantNaam"]) . "</td>";
             $txt .= "<td>" . htmlspecialchars($row["artOmschrijving"]) . "</td>";
@@ -121,29 +118,25 @@ class VerkoopOrder extends Database {
             $txt .= "<td>" . htmlspecialchars($row["verkOrdBestAantal"]) . "</td>";
             $txt .= "<td>" . htmlspecialchars($row["verkOrdStatus"]) . "</td>";
             
-            // Update form
+            // Update
+            // Wijzig knopje
             $txt .= "<td>
-                <form method='post' action='update.php'>
-                    <input type='hidden' name='verkOrdId' value='{$row["verkOrdId"]}'>
+                <form method='post' action='update.php?verkOrdId={$row["verkOrdId"]}'>
                     <button name='update'>Wzg</button>
                 </form>
             </td>";
-    
-            // Delete form
+
+            // Delete
             $txt .= "<td>
-                <form method='post' action='delete.php'>
-                    <input type='hidden' name='verkOrdId' value='{$row["verkOrdId"]}'>
+                <form method='post' action='delete.php?verkOrdId={$row["verkOrdId"]}'>
                     <button name='verwijderen'>Verwijderen</button>
                 </form>
-            </td>";
-    
+            </td>"; 
             $txt .= "</tr>";
         }
-    
         $txt .= "</table>";
         echo $txt;
     }
-    
 
     // Delete verkooporder
     /**
@@ -167,8 +160,7 @@ class VerkoopOrder extends Database {
         }
     }
 
-
-     /**
+    /**
      * Summary of updateVerkoopOrder
      * @param array $row
      * @return bool
@@ -182,7 +174,7 @@ class VerkoopOrder extends Database {
             $stmt->bindParam(':artId', $row['artId'], PDO::PARAM_INT);
             $stmt->bindParam(':verkOrdDatum', $row['verkOrdDatum'], PDO::PARAM_STR);
             $stmt->bindParam(':verkOrdBestAantal', $row['verkOrdBestAantal'], PDO::PARAM_INT);
-            $stmt->bindParam(':verkOrdStatus', $row['verkOrdStatus'], PDO::PARAM_INT); // Updated to string
+            $stmt->bindParam(':verkOrdStatus', $row['verkOrdStatus'], PDO::PARAM_STR); // Updated to string
             $stmt->execute();
             
             return true;
@@ -220,7 +212,7 @@ class VerkoopOrder extends Database {
             $stmt->bindParam(':artId', $verkoopordergegevens['artId'], PDO::PARAM_INT);
             $stmt->bindParam(':verkOrdDatum', $verkoopordergegevens['verkOrdDatum'], PDO::PARAM_STR);
             $stmt->bindParam(':verkOrdBestAantal', $verkoopordergegevens['verkOrdBestAantal'], PDO::PARAM_INT);
-            $stmt->bindParam(':verkOrdStatus', $verkoopordergegevens['verkOrdStatus'], PDO::PARAM_INT);
+            $stmt->bindParam(':verkOrdStatus', $verkoopordergegevens['verkOrdStatus'], PDO::PARAM_STR); // Updated to string
             $stmt->execute();
 
             self::$conn->commit();

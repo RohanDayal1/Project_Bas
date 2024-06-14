@@ -1,6 +1,6 @@
 <?php
 // auteur: RohanD
-// functie: update verkooporder
+// functie: update verkooporder status
 
 // Autoloader classes via Composer
 require '../../vendor/autoload.php';
@@ -34,7 +34,6 @@ if (isset($_POST["update"]) && $_POST["update"] == "Wijzigen") {
 // Als verkOrdId is opgegeven, haal verkoopordergegevens op en toon formulier
 if (isset($_GET['verkOrdId'])) {
     $row = $verkooporder->getVerkoopOrder($_GET['verkOrdId']);
-}
 ?>
 
 <!DOCTYPE html>
@@ -45,9 +44,9 @@ if (isset($_GET['verkOrdId'])) {
     <title>Verkooporder Wijzigen</title>
     <link rel="stylesheet" href="../style.css">
 </head>
-<body>
+<body class="formbody">
     <h1>Verkooporder Wijzigen</h1>
-    <form method="post">
+    <form method="post" class = "crudform">
         <input type="hidden" name="verkOrdId" value="<?= isset($row['verkOrdId']) ? htmlspecialchars($row['verkOrdId']) : '' ?>">
         <label for="klantId">Klant:</label>
         <input type="text" name="klantId"  value="<?= isset($row['klantId']) ? htmlspecialchars($row['klantId']) : '' ?>"> *</br>
@@ -70,3 +69,8 @@ if (isset($_GET['verkOrdId'])) {
 </body>
 </html>
 
+<?php
+} else {
+    echo "Geen verkOrdId opgegeven<br>";
+}
+?>
