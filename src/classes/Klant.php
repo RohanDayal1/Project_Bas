@@ -10,8 +10,8 @@ include_once "functions.php";
 
 class Klant extends Database {
     public $klantId;
-    public $klantemail = null;
     public $klantnaam;
+    public $klantemail;
     public $klantadres;
     public $klantpostcode;
     public $klantwoonplaats;
@@ -154,17 +154,23 @@ class Klant extends Database {
     }
     
     
-    public function updateKlant($row) : bool {
-        $sql = "UPDATE " . $this->table_name . " SET klantEmail = :klantEmail, klantNaam = :klantNaam, klantAdres = :klantAdres, klantPostcode = :klantPostcode, klantWoonplaats = :klantWoonplaats WHERE klantId = :klantId";
-        $stmt = self::$conn->prepare($sql);
-        $stmt->bindParam(':klantId', $row['klantId'], \PDO::PARAM_INT);
-        $stmt->bindParam(':klantEmail', $row['klantEmail'], \PDO::PARAM_STR);
-        $stmt->bindParam(':klantNaam', $row['klantNaam'], \PDO::PARAM_STR);
-        $stmt->bindParam(':klantAdres', $row['klantAdres'], \PDO::PARAM_STR);
-        $stmt->bindParam(':klantPostcode', $row['klantPostcode'], \PDO::PARAM_STR);
-        $stmt->bindParam(':klantWoonplaats', $row['klantWoonplaats'], \PDO::PARAM_STR);
-        return $stmt->execute();
-    }
+    public function updateKlant(array $row) : bool {
+    $sql = "UPDATE " . $this->table_name . " 
+            SET klantNaam = :klantNaam, 
+                klantEmail = :klantEmail, 
+                klantAdres = :klantAdres, 
+                klantPostcode = :klantPostcode, 
+                klantWoonplaats = :klantWoonplaats 
+            WHERE klantId = :klantId";
+    $stmt = self::$conn->prepare($sql);
+    $stmt->bindParam(':klantId', $row['klantId'], \PDO::PARAM_INT);
+    $stmt->bindParam(':klantNaam', $row['klantNaam'], \PDO::PARAM_STR);
+    $stmt->bindParam(':klantEmail', $row['klantEmail'], \PDO::PARAM_STR);
+    $stmt->bindParam(':klantAdres', $row['klantAdres'], \PDO::PARAM_STR);
+    $stmt->bindParam(':klantPostcode', $row['klantPostcode'], \PDO::PARAM_STR);
+    $stmt->bindParam(':klantWoonplaats', $row['klantWoonplaats'], \PDO::PARAM_STR);
+    return $stmt->execute();
+}
 
     /**
      * Summary of BepMaxKlantId
